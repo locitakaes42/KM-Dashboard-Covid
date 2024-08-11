@@ -15,7 +15,7 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="index3.html" class="brand-link">
+      <a href="/Dashboard" class="brand-link">
         <span class="brand-text font-weight-light">Knowledge Dashboard</span>
       </a>
 
@@ -25,10 +25,22 @@
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <router-link to="/dashboard" class="nav-link">
+              <a class="nav-link" @click="navigateTo('/Dashboard')">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>Dashboard</p>
-              </router-link>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" @click="navigateTo('/TopikDominan')">
+                <i class="nav-icon fas fa-th"></i>
+                <p>Topik Dominan</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" @click="navigateTo('/Klaster')">
+                <i class="nav-icon fas fa-th"></i>
+                <p>Klastering</p>
+              </a>
             </li>
           </ul>
         </nav>
@@ -42,7 +54,7 @@
 
     <!-- Main Footer -->
     <footer class="main-footer">
-      <strong>Copyright &copy; 2024 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
+      <strong>Copyright &copy; 2024 <a href="/Dashboard">Knowledge Dashboard Covid-19</a>.</strong>
       All rights reserved.
     </footer>
   </div>
@@ -60,6 +72,9 @@ export default {
     toggleSidebar() {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
       document.body.classList.toggle('sidebar-collapse');
+    },
+    navigateTo(route) {
+      this.$router.push(route);
     }
   },
   mounted() {
@@ -70,7 +85,3 @@ export default {
   }
 }
 </script>
-
-<style>
-/* Tambahkan style tambahan jika diperlukan */
-</style>
