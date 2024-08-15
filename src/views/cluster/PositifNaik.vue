@@ -1,5 +1,5 @@
 <template>
-    <div class="content-wrapper">
+
       <!-- Page Header -->
       <section class="content-header">
         <h1>
@@ -24,7 +24,7 @@
           </div>
   
           <!-- CSV Data Table -->
-          <div class="col-md-10 mb-4">
+          <div class="col-md-12 mb-4">
             <div class="card">
               <div class="card-header text-center">
                 <h3 class="card-title">Cluster Data from CSV</h3>
@@ -47,7 +47,7 @@
           </div>
         </div>
       </section>
-    </div>
+    
   </template>
   
   <script>
@@ -65,10 +65,10 @@
     methods: {
       fetchImage() {
         // Assuming the image is in the public directory or statically served
-        this.imageUrl = '/kasus/kasusplusvisual.png';
+        this.imageUrl = '/Clustering/visualkasusplus.png';
       },
       fetchCsvData() {
-        fetch('/kasus/clusterkasusplus.csv')
+        fetch('/Clustering/clustercovidplus.csv')
           .then(response => response.text())
           .then(csvText => {
             Papa.parse(csvText, {
@@ -96,7 +96,7 @@
   
   <style scoped>
   .content-wrapper {
-    padding: 20px;
+
   }
   
   .card {
