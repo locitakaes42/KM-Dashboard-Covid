@@ -77,10 +77,10 @@ export default {
     const router = useRouter();
 
     const Data14D = [
-      { id: '1-14', date: '2021-01-14', cases: 3937, casesGrowth: 0, deaths: 90, deathsGrowth: 0, recovered: 2372, recoveredGrowth: 0 },
-      { id: '1-28', date: '2021-01-28', cases: 4748, casesGrowth: 20, deaths: 135, deathsGrowth: 50, recovered: 3670, recoveredGrowth: 54 },
-      { id: '2-11', date: '2021-02-11', cases: 3694, casesGrowth: -22, deaths: 83, deathsGrowth: -38, recovered: 3697, recoveredGrowth: 0 },
-      { id: '2-25', date: '2021-02-25', cases: 2717, casesGrowth: -26, deaths: 96, deathsGrowth: 15, recovered: 3160, recoveredGrowth: -14 },
+  { id: '1-14', date: '2021-01-14', cases: 3937, casesGrowth: 0, deaths: 90, deathsGrowth: 0, recovered: 2372, recoveredGrowth: 0 },
+  { id: '1-28', date: '2021-01-28', cases: 4748, casesGrowth: 20, deaths: 135, deathsGrowth: 50, recovered: 3670, recoveredGrowth: 54 },
+  { id: '2-11', date: '2021-02-11', cases: 3694, casesGrowth: -22, deaths: 83, deathsGrowth: -38, recovered: 3697, recoveredGrowth: 0 },
+  { id: '2-25', date: '2021-02-25', cases: 2717, casesGrowth: -26, deaths: 96, deathsGrowth: 15, recovered: 3160, recoveredGrowth: -14 },
   { id: '3-11', date: '2021-03-11', cases: 2385, casesGrowth: -12, deaths: 59, deathsGrowth: -38, recovered: 2916, recoveredGrowth: -7 },
   { id: '3-25', date: '2021-03-25', cases: 2676, casesGrowth: 12, deaths: 47, deathsGrowth: -20, recovered: 2353, recoveredGrowth: -19 },
   { id: '4-08', date: '2021-04-08', cases: 2691, casesGrowth: 0, deaths: 71, deathsGrowth: 51, recovered: 2863, recoveredGrowth: 21 },
@@ -132,42 +132,26 @@ export default {
         data: {
           labels: covidData.map(data => data.Date),
           datasets: [
-            {
-              label: 'Cases',
+            { label: 'Cases',
               data: covidData.map(data => data.Cases),
               borderColor: 'rgba(75, 192, 192, 1)',
               borderWidth: 2,
-              fill: false,
-            },
-            {
-              label: 'Deaths',
+              fill: false,},
+            { label: 'Deaths',
               data: covidData.map(data => data.Deaths),
               borderColor: 'rgba(255, 99, 132, 1)',
               borderWidth: 2,
-              fill: false,
-            },
-            {
-              label: 'Recovered',
+              fill: false,},
+            { label: 'Recovered',
               data: covidData.map(data => data.Recovered),
               borderColor: 'rgba(54, 162, 235, 1)',
               borderWidth: 2,
-              fill: false,
-            }
-          ],
-        },
+              fill: false, }], },
         options: {
           responsive: true,
           scales: {
-            x: {
-              beginAtZero: true,
-            },
-            y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
-    };
+          x: {beginAtZero: true,},y: {beginAtZero: true,},
+          },},});};
 
     const goToDetail = (id) => {
       router.push({ path: `/${id}/Detail` });
