@@ -1,0 +1,72 @@
+name: Deploy Vue.js App to VPS
+
+on:
+  push:
+    branches:
+      - main # Sesuaikan dengan branch deployment Anda (misal: main, production)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # Runner yang akan menjalankan workflow
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      # Mengambil kode dari repository Anda
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Gunakan versi Node.js yang sesuai dengan proyek Anda
+
+    - name: Install dependencies
+      run: npm install
+      # Menginstal semua dependensi proyek
+
+    - name: Build Vue.js application
+      run: npm run build
+      # Membangun aplikasi Vue.js untuk produksi. Output ada di folder 'dist'.
+
+    - name: Deploy via SSH
+      uses: appleboy/scp-action@v0.1.7 # Action untuk menyalin file melalui SCP
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "dist/" # Folder yang akan disalin dari repository GitHub
+        target: ${{ secrets.DEPLOY_TARGET_PATH }} # Folder tujuan di VPS
+        # Pastikan folder target sudah ada di VPS atau buat secara otomatis jika action mendukung
+
+    - name: Run post-deployment commands
+      uses: appleboy/ssh-action@v0.1.6 # Action untuk menjalankan perintah SSH di VPS
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          # Pindah ke direktori target deployment
+          cd ${{ secrets.DEPLOY_TARGET_PATH }}
+
+          # Opsional: Hapus folder dist lama yang tidak diperlukan jika ada backup
+          # rm -rf dist-old
+
+          # Opsional: Pindahkan folder dist yang baru dibangun
+          # mv dist dist-new
+          # rm -rf dist-old # Hapus dist lama setelah yang baru siap
+          # mv dist-new dist
+
+          # Restart Nginx untuk menerapkan perubahan
+          sudo systemctl restart nginx
+          echo "Deployment successful and Nginx restarted!"
+
+    - name: Clean up old build (optional)
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          # This step is optional and depends on your deployment strategy.
+          # For example, if you swap 'dist' folders, you might clean up here.
+          echo "Cleaning up old build files on VPS (if applicable)."
+          # rm -rf old_dist_folder
