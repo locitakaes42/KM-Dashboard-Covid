@@ -3,70 +3,65 @@ name: Deploy Vue.js App to VPS
 on:
   push:
     branches:
-      - main # Sesuaikan dengan branch deployment Anda (misal: main, production)
+      - main # Sesuaikan dengan branch deployment Anda
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest # Runner yang akan menjalankan workflow
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      # Mengambil kode dari repository Anda
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20' # Gunakan versi Node.js yang sesuai dengan proyek Anda
+        node-version: '20'
 
     - name: Install dependencies
       run: npm install
-      # Menginstal semua dependensi proyek
 
     - name: Build Vue.js application
       run: npm run build
-      # Membangun aplikasi Vue.js untuk produksi. Output ada di folder 'dist'.
 
-    - name: Deploy via SSH
-      uses: appleboy/scp-action@v0.1.7 # Action untuk menyalin file melalui SCP
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "dist/" # Folder yang akan disalin dari repository GitHub
-        target: ${{ secrets.DEPLOY_TARGET_PATH }} # Folder tujuan di VPS
-        # Pastikan folder target sudah ada di VPS atau buat secara otomatis jika action mendukung
-
-    - name: Run post-deployment commands
-      uses: appleboy/ssh-action@v0.1.6 # Action untuk menjalankan perintah SSH di VPS
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          # Pindah ke direktori target deployment
-          cd ${{ secrets.DEPLOY_TARGET_PATH }}
-
-          # Opsional: Hapus folder dist lama yang tidak diperlukan jika ada backup
-          # rm -rf dist-old
-
-          # Opsional: Pindahkan folder dist yang baru dibangun
-          # mv dist dist-new
-          # rm -rf dist-old # Hapus dist lama setelah yang baru siap
-          # mv dist-new dist
-
-          # Restart Nginx untuk menerapkan perubahan
-          sudo systemctl restart nginx
-          echo "Deployment successful and Nginx restarted!"
-
-    - name: Clean up old build (optional)
+    # -- TAMBAHKAN LANGKAH INI --
+    - name: Prepare deployment directory on VPS
       uses: appleboy/ssh-action@v0.1.6
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          # This step is optional and depends on your deployment strategy.
-          # For example, if you swap 'dist' folders, you might clean up here.
-          echo "Cleaning up old build files on VPS (if applicable)."
-          # rm -rf old_dist_folder
+          # Membuat direktori target jika belum ada dan mengatur izinnya
+          sudo mkdir -p ${{ secrets.DEPLOY_TARGET_PATH }}
+          # Mengubah kepemilikan direktori ke user SSH yang digunakan untuk deployment
+          sudo chown -R ${{ secrets.SSH_USERNAME }}:${{ secrets.SSH_USERNAME }} ${{ secrets.DEPLOY_TARGET_PATH }}
+          # Mengatur izin agar pemilik bisa baca/tulis/eksekusi, grup dan lainnya hanya baca/eksekusi
+          sudo chmod -R 755 ${{ secrets.DEPLOY_TARGET_PATH }}
+          echo "Deployment target directory prepared: ${{ secrets.DEPLOY_TARGET_PATH }}"
+    # -- AKHIR DARI LANGKAH TAMBAHAN --
+
+    - name: Deploy via SSH # Ini adalah langkah scp-action yang sebelumnya error
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "dist/"
+        target: ${{ secrets.DEPLOY_TARGET_PATH }}
+
+    - name: Run post-deployment commands
+      uses: appleboy/ssh-action@v0.1.6
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ${{ secrets.DEPLOY_TARGET_PATH }}
+          # Opsional: Jika Anda ingin menghapus folder dist lama sebelum menimpa
+          # rm -rf dist-old # Hapus dist lama setelah yang baru siap
+          # mv dist dist-old # Backup yang lama sebelum disalin yang baru
+          # Atau jika Anda menyalin langsung ke folder yang sama, scp akan menimpa
+
+          sudo systemctl restart nginx
+          echo "Deployment successful and Nginx restarted!"
